@@ -63,14 +63,18 @@ def ask_name(nb_player):
         print(WARNING + "Please use only letters\n"+ ENDC)
 
 
-def ask_number(player):
+def ask_number(list_name, index_player, playboard, score):
     """
     Check if the input is between 0 and 8
     """
+    player = list_name[index_player]
     while True:
         digit = input(HEADER + f"\n\n{player}, enter a box to play : \n" + ENDC)
         if digit.isdigit() and len(digit) == 1 and digit != "9":
             return int(digit)
+        #Todo: bien faire l'affichage avec encore le scoreboard etc, à mettre dans une fonction
+        os.system('clear')
+        display_game(playboard, list_name, score)
         print(WARNING + f"{player}, please enter a number between 0 and 8\n" + ENDC)
 
 
@@ -165,6 +169,14 @@ def display_gameboard(array):
                 print(HEADER + "|" + ENDC)
                 abscisse = 0
 
+def display_game(gameboard, list_name, score):
+    """
+    Todo: commentaire
+    """
+    print("\n\n" + HEADER + f" {list_name[0]}: {score[0]} ;  {list_name[1]}: {score[1]} ; Draw: {score[2]}\n\n" + ENDC)
+    display_gameboard(gameboard)
+
+
 def start_game(name1, name2, score):
     """
     Main game
@@ -182,14 +194,15 @@ def start_game(name1, name2, score):
     print(f"   {list_name[index_player]} starts \n" + ENDC)
 
     while not is_finished(playboard, current_symbol):
-        print(HEADER + f" {name1}: {score[0]} ;  {name2}: {score[1]} \n\n" + ENDC)
-        display_gameboard(playboard)
+        display_game(playboard, list_name, score)
 
-        box_to_play = ask_number(list_name[index_player])
+        box_to_play = ask_number(list_name, index_player, playboard, score)
         ordonnee, abscisse  = convert(box_to_play)
         while is_occupy(playboard[ordonnee][abscisse]):
+            os.system('clear')
+            display_game(playboard, list_name, score)
             print(WARNING + "The box is already occupied, choose another one : \n" + ENDC)
-            box_to_play = ask_number(list_name[index_player])
+            box_to_play = ask_number(list_name, index_player, playboard, score)
             ordonnee, abscisse  = convert(box_to_play)
 
         playboard[ordonnee][abscisse] = current_symbol
@@ -197,19 +210,18 @@ def start_game(name1, name2, score):
         if is_win(playboard, current_symbol):
             os.system('clear')
             print(OKGREEN + f"{list_name[index_player]} won the game! "  + ENDC)
-            display_gameboard(playboard)
+            display_game(playboard, list_name, score)
             return index_player
 
         if is_full(playboard):
             os.system('clear')
             print(FAIL + "It's a draw!" + ENDC)
             display_gameboard(playboard)
-            return None
+            return 2
 
         index_player = (index_player + 1) %2
         current_symbol = list_symbol[index_player]
         os.system('clear')
-        print("\n\n")
 
 
 
@@ -218,7 +230,7 @@ if __name__ == "__main__":
     name_p1 = ask_name(1)
     name_p2 = ask_name(2)
 
-    scoreboard = [0,0] #nb points de joueur1 et de joueur 2, respectivement
+    scoreboard = [0,0,0] #nb points de joueur1 et de joueur 2, respectivement
 
     while 1:
         index_winner = start_game(name_p1, name_p2, scoreboard)
@@ -230,4 +242,7 @@ if __name__ == "__main__":
             valeur = input(HEADER + "Do u want to continue ? [y] or [n] \n" + ENDC)
 
         if valeur == "n":
+            os.system("clear")
+            print(HEADER + "FINAL SCORE: \n")
+            print(f"{name_p1[0]}: {scoreboard[0]} ;  {name_p1[1]}: {scoreboard[1]} ; Draw: {scoreboard[2]}\n\n" + ENDC)
             break
