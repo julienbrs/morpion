@@ -18,17 +18,9 @@ class Bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-
-# def initialize_playboard():
-#     playboard = []
-#     for i in range(1,4):
-#         line = []
-
-#         for j in range(1,4):
-#             line.append((i-1) * 3 + j)
-
-#         playboard.append(line)
-#     return playboard
+CWARNING = Bcolors.WARNING
+CHEADER = Bcolors.HEADER
+CE = Bcolors.ENDC
 
 def initialize_playboard():
     "Initialize the playboard 3x3"
@@ -50,13 +42,29 @@ def is_occupy(box):
         return False
     return True
 
-def is_input_legit(val):
+# functions check if input are legit
+
+def ask_name(nb_player):
+    """
+    Ask for name
+    """
+    while True:
+        name = input(Bcolors.OKCYAN + f"Name of player {nb_player} ?\n"+ CE)
+        if name.isalpha():
+            return name
+        print(CWARNING + "Please use only letters\n"+ CE)
+
+
+def ask_number(player):
     """
     Check if the input is between 0 and 8
     """
-    if 48 <= ord(str(val)) <= 56:
-        return True
-    return False
+    while True:
+        digit = input(CHEADER + f"\n\n{player}, enter a box to play : \n" + CE)
+        if digit.isdigit() and len(digit) == 1 and digit != "9":
+            return int(digit)
+        print(CWARNING + f"{player}, please enter a number between 0 and 8\n" + CE)
+
 
 def is_full(array):
     """
@@ -129,19 +137,18 @@ def display_gameboard(array):
     """
     abscisse = 0
     for lines in array:
-        print(Bcolors.HEADER + "         |" + Bcolors.ENDC, end= "")
+        print(CHEADER + "         |" + CE, end= "")
         for box in lines:
             if box == "X":
-                print(Bcolors.FAIL + str(box) + Bcolors.ENDC, end = "")
+                print(Bcolors.FAIL + str(box) + CE, end = "")
             elif box == "O":
-                print(Bcolors.OKGREEN + str(box) + Bcolors.ENDC, end = "")
+                print(Bcolors.OKGREEN + str(box) + CE, end = "")
             else:
-                print(Bcolors.HEADER + str(box) + Bcolors.ENDC, end = "")
-            #print(box, end = "")
+                print(CHEADER + str(box) + CE, end = "")
             abscisse += 1
 
             if abscisse == 3:
-                print(Bcolors.HEADER + "|" + Bcolors.ENDC)
+                print(CHEADER + "|" + CE)
                 abscisse = 0
 
 def convert(number):
@@ -155,7 +162,7 @@ def start_game(name1, name2, pts):
     Main game
     """
     os.system('clear')
-    print(Bcolors.HEADER + " ----- START OF THE GAME ----- \n")
+    print(CHEADER + " ----- START OF THE GAME ----- \n")
     playboard = initialize_playboard()
     joueur1 = "X"
     joueur2 = "O"
@@ -164,20 +171,14 @@ def start_game(name1, name2, pts):
 
     current_player = list_symbol[randint(0,1)]
     index_player = list_symbol.index(current_player)
-    print(f"   {list_name[index_player]} starts \n" + Bcolors.ENDC)
+    print(f"   {list_name[index_player]} starts \n" + CE)
     while not is_finished(playboard, current_player):
-        print(Bcolors.HEADER + f"                                 {name1}: {pts[0]} ;  {name2}: {pts[1]} \n" + Bcolors.ENDC)
+        print(CHEADER + f"                                 {name1}: {pts[0]} ;  {name2}: {pts[1]} \n" + CE)
         display_gameboard(playboard)
-
-        box_to_play = input(Bcolors.HEADER + f"\n\n{list_name[index_player]}, enter a box to play : \n" + Bcolors.ENDC)
-
-        while not is_input_legit(box_to_play):
-            box_to_play = input(Bcolors.WARNING + f"{list_name[index_player]}, please enter a number between 0 and 8\n" + Bcolors.ENDC)
-
-        box_to_play = int(box_to_play)
+        box_to_play = ask_number(list_name[index_player])
         ordonnee, abscisse  = convert(box_to_play)
         while is_occupy(playboard[ordonnee][abscisse]):
-            print(Bcolors.WARNING + "The box is already occupied, choose another one : \n" + Bcolors.ENDC)
+            print(CWARNING + "The box is already occupied, choose another one : \n" + CE)
             box_to_play = int(input())
             ordonnee, abscisse  = convert(box_to_play)
 
@@ -185,13 +186,13 @@ def start_game(name1, name2, pts):
 
         if is_win(playboard, current_player):
             os.system('clear')
-            print(Bcolors.OKGREEN + f"{list_name[index_player]} won the game! "  + Bcolors.ENDC)
+            print(Bcolors.OKGREEN + f"{list_name[index_player]} won the game! "  + CE)
             display_gameboard(playboard)
             return index_player
 
         if is_full(playboard):
             os.system('clear')
-            print(Bcolors.FAIL + "It's a draw!" + Bcolors.ENDC)
+            print(Bcolors.FAIL + "It's a draw!" + CE)
             display_gameboard(playboard)
             return None
 
@@ -202,13 +203,8 @@ def start_game(name1, name2, pts):
 
 if __name__ == "__main__":
     os.system('clear')
-    name_p1 = input(Bcolors.OKCYAN + "Name of player 1 ?\n"+ Bcolors.ENDC)
-    while not len(name_p1) > 2:
-        name_p1 = input(Bcolors.WARNING + "Need more than 3 letters, name of Player 1 ?\n"+ Bcolors.ENDC)
-
-    name_p2 = input(Bcolors.OKCYAN + "Name of player 2 ?\n" + Bcolors.ENDC)
-    while not len(name_p2) > 2 or name_p1 == name_p2:
-        name_p2 = input(Bcolors.WARNING + "Need more than 3 letters, name of Player 2 ?\n" + Bcolors.ENDC)
+    name_p1 = ask_name(1)
+    name_p2 = ask_name(2)
 
     nb_pts = [0,0] #nb points de joueur1 et de joueur 2, respectivement
 
@@ -216,10 +212,10 @@ if __name__ == "__main__":
         index_winner = start_game(name_p1, name_p2, nb_pts)
         nb_pts[index_winner] += 1
 
-        valeur = input(Bcolors.HEADER + "Do u want to continue ? [y] or [n] \n" + Bcolors.ENDC).strip()
+        valeur = input(CHEADER + "Do u want to continue ? [y] or [n] \n" + CE).strip()
         while valeur not in ("y, n"):
-            print(Bcolors.WARNING + "\nPlease press [y] or [n]" + Bcolors.ENDC)
-            valeur = input(Bcolors.HEADER + "Do u want to continue ? [y] or [n] \n" + Bcolors.ENDC)
+            print(CWARNING + "\nPlease press [y] or [n]" + CE)
+            valeur = input(CHEADER + "Do u want to continue ? [y] or [n] \n" + CE)
 
         if valeur == "n":
             break
