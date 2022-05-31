@@ -6,22 +6,20 @@
 from random import randint
 import os
 
-class Bcolors:
-    "list of colors"
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+# Global variables
 
-CWARNING = Bcolors.WARNING
-CHEADER = Bcolors.HEADER
-CE = Bcolors.ENDC
+# list of colors
+HEADER = '\033[95m'
+OKBLUE = '\033[94m'
+OKCYAN = '\033[96m'
+OKGREEN = '\033[92m'
+WARNING = '\033[93m'
+FAIL = '\033[91m'
+ENDC = '\033[0m'
+BOLD = '\033[1m'
+UNDERLINE = '\033[4m'
 
+#Functions initializing the game
 def initialize_playboard():
     "Initialize the playboard 3x3"
     playboard = []
@@ -34,6 +32,9 @@ def initialize_playboard():
         playboard.append(line)
     return playboard
 
+
+# Tools
+
 def is_occupy(box):
     """
     Check if a box is occupy
@@ -42,17 +43,24 @@ def is_occupy(box):
         return False
     return True
 
-# functions check if input are legit
 
+def convert(number):
+    """
+    Convert the number to abs/ord
+    """
+    return number // 3, number % 3
+
+
+# Functions interacting with user
 def ask_name(nb_player):
     """
     Ask for name
     """
     while True:
-        name = input(Bcolors.OKCYAN + f"Name of player {nb_player} ?\n"+ CE)
+        name = input(OKCYAN + f"Name of player {nb_player} ?\n"+ ENDC)
         if name.isalpha():
             return name
-        print(CWARNING + "Please use only letters\n"+ CE)
+        print(WARNING + "Please use only letters\n"+ ENDC)
 
 
 def ask_number(player):
@@ -60,11 +68,14 @@ def ask_number(player):
     Check if the input is between 0 and 8
     """
     while True:
-        digit = input(CHEADER + f"\n\n{player}, enter a box to play : \n" + CE)
+        digit = input(HEADER + f"\n\n{player}, enter a box to play : \n" + ENDC)
         if digit.isdigit() and len(digit) == 1 and digit != "9":
             return int(digit)
-        print(CWARNING + f"{player}, please enter a number between 0 and 8\n" + CE)
+        print(WARNING + f"{player}, please enter a number between 0 and 8\n" + ENDC)
 
+
+
+# Functions testing the end of the game
 
 def is_full(array):
     """
@@ -131,91 +142,92 @@ def is_finished(array, symbol):
     """
     return (is_full(array) or is_win(array, symbol))
 
+
+# Graphics functions
+
 def display_gameboard(array):
     """
     display the gameboard
     """
     abscisse = 0
     for lines in array:
-        print(CHEADER + "         |" + CE, end= "")
+        print(HEADER + "         |" + ENDC, end= "")
         for box in lines:
             if box == "X":
-                print(Bcolors.FAIL + str(box) + CE, end = "")
+                print(FAIL + str(box) + ENDC, end = "")
             elif box == "O":
-                print(Bcolors.OKGREEN + str(box) + CE, end = "")
+                print(OKGREEN + str(box) + ENDC, end = "")
             else:
-                print(CHEADER + str(box) + CE, end = "")
+                print(HEADER + str(box) + ENDC, end = "")
             abscisse += 1
 
             if abscisse == 3:
-                print(CHEADER + "|" + CE)
+                print(HEADER + "|" + ENDC)
                 abscisse = 0
 
-def convert(number):
-    """
-    Convert the number to abs/ord
-    """
-    return number // 3, number % 3
-
-def start_game(name1, name2, pts):
+def start_game(name1, name2, score):
     """
     Main game
     """
     os.system('clear')
-    print(CHEADER + " ----- START OF THE GAME ----- \n")
+    print(HEADER + " ----- START OF THE GAME ----- \n")
     playboard = initialize_playboard()
-    joueur1 = "X"
-    joueur2 = "O"
-    list_symbol = [joueur1, joueur2]
+    symb1 = "X"
+    symb2 = "O"
+    list_symbol = [symb1, symb2]
     list_name = [name1, name2]
 
-    current_player = list_symbol[randint(0,1)]
-    index_player = list_symbol.index(current_player)
-    print(f"   {list_name[index_player]} starts \n" + CE)
-    while not is_finished(playboard, current_player):
-        print(CHEADER + f"                                 {name1}: {pts[0]} ;  {name2}: {pts[1]} \n" + CE)
+    current_symbol = list_symbol[randint(0,1)]
+    index_player = list_symbol.index(current_symbol)
+    print(f"   {list_name[index_player]} starts \n" + ENDC)
+
+    while not is_finished(playboard, current_symbol):
+        print(HEADER + f" {name1}: {score[0]} ;  {name2}: {score[1]} \n\n" + ENDC)
         display_gameboard(playboard)
+
         box_to_play = ask_number(list_name[index_player])
         ordonnee, abscisse  = convert(box_to_play)
         while is_occupy(playboard[ordonnee][abscisse]):
-            print(CWARNING + "The box is already occupied, choose another one : \n" + CE)
-            box_to_play = int(input())
+            print(WARNING + "The box is already occupied, choose another one : \n" + ENDC)
+            box_to_play = ask_number(list_name[index_player])
             ordonnee, abscisse  = convert(box_to_play)
 
-        playboard[ordonnee][abscisse] = current_player
+        playboard[ordonnee][abscisse] = current_symbol
 
-        if is_win(playboard, current_player):
+        if is_win(playboard, current_symbol):
             os.system('clear')
-            print(Bcolors.OKGREEN + f"{list_name[index_player]} won the game! "  + CE)
+            print(OKGREEN + f"{list_name[index_player]} won the game! "  + ENDC)
             display_gameboard(playboard)
             return index_player
 
         if is_full(playboard):
             os.system('clear')
-            print(Bcolors.FAIL + "It's a draw!" + CE)
+            print(FAIL + "It's a draw!" + ENDC)
             display_gameboard(playboard)
             return None
 
         index_player = (index_player + 1) %2
-        current_player = list_symbol[index_player]
+        current_symbol = list_symbol[index_player]
         os.system('clear')
         print("\n\n")
+
+
 
 if __name__ == "__main__":
     os.system('clear')
     name_p1 = ask_name(1)
     name_p2 = ask_name(2)
 
-    nb_pts = [0,0] #nb points de joueur1 et de joueur 2, respectivement
+    scoreboard = [0,0] #nb points de joueur1 et de joueur 2, respectivement
 
     while 1:
-        index_winner = start_game(name_p1, name_p2, nb_pts)
-        nb_pts[index_winner] += 1
+        index_winner = start_game(name_p1, name_p2, scoreboard)
+        scoreboard[index_winner] += 1
 
-        valeur = input(CHEADER + "Do u want to continue ? [y] or [n] \n" + CE).strip()
+        valeur = input(HEADER + "Do u want to continue ? [y] or [n] \n" + ENDC).strip()
         while valeur not in ("y, n"):
-            print(CWARNING + "\nPlease press [y] or [n]" + CE)
-            valeur = input(CHEADER + "Do u want to continue ? [y] or [n] \n" + CE)
+            print(WARNING + "\nPlease press [y] or [n]" + ENDC)
+            valeur = input(HEADER + "Do u want to continue ? [y] or [n] \n" + ENDC)
 
         if valeur == "n":
             break
