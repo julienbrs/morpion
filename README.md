@@ -14,6 +14,8 @@
   </p>
 </div>
 
+<strong>Old project done in 2021/2022</strong>
+
 <!-- TABLE OF CONTENTS -->
 
 <summary>Table of Contents</summary>
@@ -38,7 +40,7 @@
 
 ## About The Project
 
-[![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
+[![Python Badge](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://www.python.org/)
 <br />
 
 <p align="center">
